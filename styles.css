@@ -5,8 +5,8 @@ body {
 
 /* Clean Navigation Bar */
 .mdl-layout__header {
-    background: linear-gradient(135deg, #3f51b5 0%, #5c6bc0 100%);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    background: linear-gradient(135deg, #00acc1 0%, #26c6da 100%);
+    box-shadow: 0 2px 8px rgba(0, 172, 193, 0.2);
     height: 64px;
 }
 
@@ -84,7 +84,7 @@ body {
 
 /* Hero Section - Index Page */
 .hero-section {
-    background: linear-gradient(135deg, #3f51b5 0%, #5c6bc0 100%);
+    background: linear-gradient(135deg, #00acc1 0%, #26c6da 100%);
     color: white;
     padding: 80px 20px;
     text-align: center;
@@ -165,7 +165,7 @@ body {
 
 .icon-header {
     font-size: 40px;
-    color: #3f51b5;
+    color: #00acc1;
 }
 
 .page-header p {
@@ -229,7 +229,7 @@ body {
 .topic-list li .material-icons {
     font-size: 18px;
     margin-right: 8px;
-    color: #3f51b5;
+    color: #00acc1;
 }
 
 /* Resources Section */
@@ -253,7 +253,7 @@ body {
 
 .resource-card-title {
     padding: 20px;
-    background: #3f51b5;
+    background: linear-gradient(135deg, #00acc1 0%, #26c6da 100%);
     color: white;
 }
 
@@ -365,7 +365,7 @@ body {
 /* Sidebar Styles */
 .sidebar-title {
     padding: 20px;
-    background: #3f51b5;
+    background: linear-gradient(135deg, #00acc1 0%, #26c6da 100%);
     color: white;
 }
 
@@ -398,11 +398,11 @@ body {
 }
 
 .category-list li a:hover {
-    color: #3f51b5;
+    color: #00acc1;
 }
 
 .category-list li .material-icons {
-    color: #3f51b5;
+    color: #00acc1;
 }
 
 .contributors-list {
@@ -427,7 +427,7 @@ body {
     width: 40px;
     height: 40px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #3f51b5 0%, #5c6bc0 100%);
+    background: linear-gradient(135deg, #00acc1 0%, #26c6da 100%);
     display: flex;
     align-items: center;
     justify-content: center;
