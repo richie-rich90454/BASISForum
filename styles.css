@@ -1,67 +1,6 @@
-/* Update: Changed prime color to #3f51b5 */
-
+/* Apply Aptos font globally */
 body {
     font-family: 'Aptos', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-}
-
-/* Clean Navigation Bar */
-.mdl-layout__header {
-    background: linear-gradient(135deg, #3f51b5 0%, #5c6bc0 100%);
-    box-shadow: 0 2px 8px rgba(63, 81, 181, 0.2);
-    height: 64px;
-}
-
-.mdl-layout__header-row {
-    padding: 0 24px;
-    height: 64px;
-}
-
-.mdl-layout-title {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: white;
-    letter-spacing: 0.5px;
-}
-
-.mdl-navigation {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.mdl-navigation__link {
-    color: rgba(255, 255, 255, 0.9);
-    font-weight: 500;
-    padding: 8px 16px;
-    border-radius: 8px;
-    transition: all 0.3s ease;
-    text-decoration: none;
-    font-size: 0.95rem;
-    position: relative;
-}
-
-.mdl-navigation__link:hover {
-    background: rgba(255, 255, 255, 0.15);
-    color: white;
-}
-
-.mdl-navigation__link.is-active {
-    background: rgba(255, 255, 255, 0.25);
-    color: white;
-    font-weight: 600;
-    border-bottom: none;
-}
-
-.mdl-navigation__link.is-active::after {
-    content: '';
-    position: absolute;
-    bottom: 6px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 24px;
-    height: 3px;
-    background: white;
-    border-radius: 2px;
 }
 
 /* Outlined icons styling */
@@ -83,9 +22,83 @@ body {
     font-feature-settings: 'liga';
 }
 
+/* Active navigation link styling */
+.mdl-navigation__link.is-active {
+    font-weight: 600;
+    border-bottom: 3px solid #fff;
+}
+
+/* Account Menu Styling */
+.account-menu {
+    position: relative;
+    margin-left: 16px;
+}
+
+.account-button {
+    background: none;
+    border: none;
+    color: white;
+    padding: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: background-color 0.3s ease;
+}
+
+.account-button:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.account-button i {
+    font-size: 28px;
+}
+
+.account-dropdown {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: white;
+    border-radius: 4px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    min-width: 200px;
+    margin-top: 8px;
+    display: none;
+    z-index: 1000;
+    overflow: hidden;
+}
+
+.account-menu:hover .account-dropdown {
+    display: block;
+}
+
+.account-option {
+    display: flex;
+    align-items: center;
+    padding: 12px 16px;
+    color: #333;
+    text-decoration: none;
+    transition: background-color 0.2s ease;
+    font-size: 14px;
+}
+
+.account-option:hover {
+    background-color: #f5f5f5;
+}
+
+.account-option i {
+    margin-right: 12px;
+    font-size: 20px;
+}
+
+.account-option.logout {
+    color: #d32f2f;
+}
+
 /* Hero Section - Index Page */
 .hero-section {
-    background: linear-gradient(135deg, #3f51b5 0%, #5c6bc0 100%);
+    background: linear-gradient(135deg, #3454A5 0%, #5676C7 100%);
     color: white;
     padding: 80px 20px;
     text-align: center;
@@ -148,7 +161,7 @@ body {
     line-height: 1.6;
 }
 
-  /* Page Headers */
+/* Page Headers */
 .page-header {
     padding: 40px 20px 20px;
     text-align: center;
@@ -157,17 +170,16 @@ body {
 .page-header h1 {
     font-size: 2.5rem;
     font-weight: 600;
-    color: white;
+    color: #333;
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 12px;
-    background: #3f51b5;
 }
 
 .icon-header {
     font-size: 40px;
-    color: white;
+    color: #3454A5;
 }
 
 .page-header p {
@@ -176,43 +188,7 @@ body {
     margin-top: 10px;
 }
 
-/* Period Overview Section */
-.period-overview-section {
-    margin-top: 60px;
-    padding: 40px 20px;
-    background: #f8f9fa;
-    border-radius: 8px;
-}
-
-.period-card {
-    height: 100%;
-    margin-bottom: 24px;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.period-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 8px 16px rgba(0,0,0,0.1);
-}
-
-.period-card .mdl-card__title {
-    color: white;
-    padding: 24px;
-}
-
-.period-early {
-    background: linear-gradient(135deg, #8e24aa 0%, #ab47bc 100%);
-}
-
-.period-middle {
-    background: linear-gradient(135deg, #3949ab 0%, #5c6bc0 100%);
-}
-
-.period-modern {
-    background: linear-gradient(135deg, #00897b 0%, #26a69a 100%);
-}
-
-  /* Study Guide Page Styles */
+/* Study Guide Page Styles */
 .page-content {
     padding: 0 16px 40px;
 }
@@ -220,6 +196,82 @@ body {
 .subject-card {
     height: 100%;
     margin-bottom: 24px;
+}
+
+/* Account page styles */
+.account-container {
+    max-width: 480px;
+    margin: 60px auto;
+    padding: 20px;
+}
+
+.form-box {
+    background: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    padding: 24px;
+}
+
+.form-box h2 {
+    margin-top: 0;
+    margin-bottom: 20px;
+    font-size: 1.8rem;
+    text-align: center;
+    color: #3454A5;
+}
+
+.form-group {
+    margin-bottom: 16px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 1rem;
+    box-sizing: border-box;
+}
+
+.form-actions {
+    text-align: center;
+    margin-top: 12px;
+}
+
+.form-actions button {
+    background: #3454A5;
+    color: #fff;
+    border: none;
+    padding: 10px 24px;
+    font-size: 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.form-actions button:hover {
+    background: #5676C7;
+}
+
+.toggle-link {
+    color: #3454A5;
+    text-decoration: underline;
+    cursor: pointer;
+    font-size: 0.95rem;
+}
+
+.form-error {
+    color: #d32f2f;
+    font-size: 0.9rem;
+    margin-top: -8px;
+    margin-bottom: 8px;
 }
 
 .subject-card .mdl-card__title {
@@ -244,24 +296,11 @@ body {
 }
 
 .subject-coding {
-    background: linear-gradient(135deg, #3f51b5 0%, #5c6bc0 100%);
+    background: linear-gradient(135deg, #00bcd4 0%, #26c6da 100%);
 }
 
 .subject-languages {
     background: linear-gradient(135deg, #9c27b0 0%, #ab47bc 100%);
-}
-
-/* AP World History Period Cards */
-.period-early {
-    background: linear-gradient(135deg, #8e24aa 0%, #ab47bc 100%);
-}
-
-.period-middle {
-    background: linear-gradient(135deg, #3949ab 0%, #5c6bc0 100%);
-}
-
-.period-modern {
-    background: linear-gradient(135deg, #00897b 0%, #26a69a 100%);
 }
 
 .topic-list {
@@ -280,7 +319,7 @@ body {
 .topic-list li .material-icons {
     font-size: 18px;
     margin-right: 8px;
-    color: #3f51b5;
+    color: #3454A5;
 }
 
 /* Resources Section */
@@ -304,7 +343,7 @@ body {
 
 .resource-card-title {
     padding: 20px;
-    background: linear-gradient(135deg, #3f51b5 0%, #5c6bc0 100%);
+    background: #3454A5;
     color: white;
 }
 
@@ -313,10 +352,6 @@ body {
     display: flex;
     align-items: center;
     gap: 10px;
-}
-
-.button {
-    background-color: #3f51b5;
 }
 
 /* Forum Page Styles */
@@ -368,7 +403,7 @@ body {
 
 .badge-question {
     background: #e3f2fd;
-    color: #1976d2;
+    color: #5787C7;
 }
 
 .badge-discussion {
@@ -420,7 +455,7 @@ body {
 /* Sidebar Styles */
 .sidebar-title {
     padding: 20px;
-    background: linear-gradient(135deg, #3f51b5 0%, #5c6bc0 100%);
+    background: #3454A5;
     color: white;
 }
 
@@ -453,11 +488,11 @@ body {
 }
 
 .category-list li a:hover {
-    color: #3f51b5;
+    color: #5676C7;
 }
 
 .category-list li .material-icons {
-    color: #3f51b5;
+    color: #5676C7;
 }
 
 .contributors-list {
@@ -482,7 +517,7 @@ body {
     width: 40px;
     height: 40px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #3f51b5 0%, #5c6bc0 100%);
+    background: linear-gradient(135deg, #3454A5 0%, #5676C7 100%);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -586,4 +621,3 @@ body {
         width: 100%;
     }
 }
-/* Add other necessary CSS updates here */
