@@ -419,7 +419,6 @@
                         <i class="material-icons-outlined">thumb_down</i>
                         <span class="modal-vote-count" id="modalDislikeCount">0</span>
                     </button>
-                    <span id="voteStatus" class="vote-locked-message"></span>
                 </div>
             </div>
         </div>
@@ -557,7 +556,6 @@
         };
 
         let currentPostId = null;
-        let hasReadPost = {};
 
         // Store vote data in localStorage
         function getVotes() {
@@ -619,14 +617,6 @@
             // Update vote buttons
             updateModalVoteButtons(postId);
 
-            // Reset read status for this session
-            if (!hasReadPost[postId]) {
-                disableVoteButtons();
-                document.getElementById('voteStatus').textContent = "Please read the post before voting";
-            } else {
-                enableVoteButtons();
-                document.getElementById('voteStatus').textContent = "";
-            }
 
             // Show modal
             document.getElementById('postModal').classList.add('active');
@@ -665,48 +655,9 @@
             }
         }
 
-        // Mark post as read and enable voting
-        function markPostAsRead() {
-            if (currentPostId && !hasReadPost[currentPostId]) {
-                hasReadPost[currentPostId] = true;
-                enableVoteButtons();
-                document.getElementById('voteStatus').textContent = "";
-            }
-        }
-
-        // Enable vote buttons
-        function enableVoteButtons() {
-            const likeBtn = document.getElementById('modalLikeBtn');
-            const dislikeBtn = document.getElementById('modalDislikeBtn');
-            likeBtn.disabled = false;
-            dislikeBtn.disabled = false;
-            likeBtn.style.opacity = '1';
-            dislikeBtn.style.opacity = '1';
-            likeBtn.style.cursor = 'pointer';
-            dislikeBtn.style.cursor = 'pointer';
-        }
-
-        // Disable vote buttons
-        function disableVoteButtons() {
-            const likeBtn = document.getElementById('modalLikeBtn');
-            const dislikeBtn = document.getElementById('modalDislikeBtn');
-            likeBtn.disabled = true;
-            dislikeBtn.disabled = true;
-            likeBtn.style.opacity = '0.5';
-            dislikeBtn.style.opacity = '0.5';
-            likeBtn.style.cursor = 'not-allowed';
-            dislikeBtn.style.cursor = 'not-allowed';
-        }
-
         // Handle voting in modal
         function modalVote(voteType) {
             if (!currentPostId) return;
-
-            // Check if post has been read
-            if (!hasReadPost[currentPostId]) {
-                alert("Please read the post before voting!");
-                return;
-            }
 
             const votes = getVotes();
             const userVotes = getUserVotes();
@@ -776,17 +727,6 @@
             }
         });
 
-        // Track scroll to mark post as read
-        document.querySelector('.modal-body').addEventListener('scroll', function() {
-            if (currentPostId && !hasReadPost[currentPostId]) {
-                const content = this.querySelector('.post-detail-content');
-                const scrollPercentage = (this.scrollTop + this.clientHeight) / this.scrollHeight;
-                
-                if (scrollPercentage > 0.5) {
-                    markPostAsRead();
-                }
-            }
-        });
 
         // Initialize on page load
         document.addEventListener('DOMContentLoaded', function() {
