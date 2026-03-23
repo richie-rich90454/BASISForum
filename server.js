@@ -326,6 +326,6 @@ app.get('/api/contributors', (req, res) => {
   res.json({ contributors: list.slice(0, 10) });
 });
 
-app.listen(PORT, () => {
-  console.log(`Server listening on http://localhost:${PORT}`);
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`Server listening on port ${PORT}`);
 });
