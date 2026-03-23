@@ -9,7 +9,7 @@ const sanitizeHtml = require('sanitize-html');
 const rateLimit = require('express-rate-limit');
 
 const app = express();
-const PORT = process.env.PORT || 80;
+const PORT = process.env.PORT || 3333;
 
 app.use(cors({ origin: true, credentials: true }));
 app.use(express.json());
