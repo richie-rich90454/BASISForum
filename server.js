@@ -17,7 +17,7 @@ app.use(cookieParser());
 // Rate limiter for auth endpoints to mitigate brute force
 const authLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 10, message: { error: 'Too many requests, please try again later.' } });
 
-const { getDb } = require('./database');
+const { getDb, closeDatabase } = require('./database');
 
 // Helper function to get database connection
 function getDatabase() {
@@ -26,11 +26,14 @@ function getDatabase() {
 
 // Helper function to get session from cookie and validate
 function getSessionFromCookie(req, res) {
-  const token = req.cookies.sessionToken;
-  if (!token) return null;
-  
-  const db = getDatabase();
   return new Promise((resolve, reject) => {
+    const token = req.cookies.sessionToken;
+    if (!token) {
+      resolve(null);
+      return;
+    }
+    
+    const db = getDatabase();
     db.get('SELECT * FROM sessions WHERE token = ?', [token], (err, session) => {
       if (err) {
         reject(err);
