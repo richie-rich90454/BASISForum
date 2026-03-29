@@ -22,6 +22,11 @@ const USERS_FILE = path.join(DATA_DIR, 'users.json');
 const SESSIONS_FILE = path.join(DATA_DIR, 'sessions.json');
 const POSTS_FILE = path.join(DATA_DIR, 'posts.json');
 
+function validateEmail(email) {
+  const regex = /^[a-zA-Z]+\.[a-zA-Z]+\d+-[a-zA-Z]+@basischina\.com$/;
+  return regex.test(email);
+}
+
 function readJson(filePath) {
   try {
     if (!fs.existsSync(filePath)) return {};
@@ -47,6 +52,7 @@ app.use(express.static(path.join(__dirname)));
 app.post('/api/signup', authLimiter, async (req, res) => {
   const { email, password } = req.body || {};
   if (!email || !password) return res.status(400).json({ error: 'Missing email or password' });
+  if (!validateEmail(email)) return res.status(400).json({ error: 'Invalid email' });
   const emailKey = email.toLowerCase();
 
   const users = readJson(USERS_FILE);
@@ -74,6 +80,7 @@ app.post('/api/signup', authLimiter, async (req, res) => {
 app.post('/api/login', authLimiter, async (req, res) => {
   const { email, password } = req.body || {};
   if (!email || !password) return res.status(400).json({ error: 'Missing email or password' });
+  if (!validateEmail(email)) return res.status(400).json({ error: 'Invalid email' });
   const emailKey = email.toLowerCase();
 
   const users = readJson(USERS_FILE);
@@ -264,6 +271,11 @@ app.post('/api/posts', (req, res) => {
     return res.status(400).json({ error: 'Title and content cannot be empty' });
   }
 
+  const users = readJson(USERS_FILE);
+  const user = users[session.email];
+  const displayName = user ? (user.name || session.email.split('@')[0]) : session.email.split('@')[0];
+  const avatar = user ? (user.icon || 'default') : 'default';
+
   const posts = readJson(POSTS_FILE) || {};
   const id = uuidv4();
   posts[id] = {
@@ -272,9 +284,16 @@ app.post('/api/posts', (req, res) => {
     badge: sanitizedBadge,
     badgeClass: sanitizedBadge.toLowerCase() === 'question' ? 'badge-question' : (sanitizedBadge.toLowerCase() === 'tips' ? 'badge-tips' : (sanitizedBadge.toLowerCase() === 'resource' ? 'badge-resource' : 'badge-discussion')),
     author: session.email,
+    authorName: displayName,
+    authorAvatar: avatar,
+    authorEmail: session.email,
     category: sanitizedCategory,
     date: new Date().toISOString(),
     replies: '0 replies',
+    likes: 0,
+    dislikes: 0,
+    userVotes: {}, // email -> 'like' or 'dislike'
+    comments: [],
     createdAt: new Date().toISOString()
   };
   writeJson(POSTS_FILE, posts);
@@ -315,6 +334,102 @@ app.delete('/api/posts/:id', (req, res) => {
   delete posts[id];
   writeJson(POSTS_FILE, posts);
   res.json({ success: true });
+});
+
+// Vote on a post
+app.post('/api/posts/:id/vote', (req, res) => {
+  const session = getSessionFromCookie(req, res);
+  if (!session) return res.status(401).json({ error: 'Unauthorized' });
+  const id = req.params.id;
+  const { vote } = req.body || {}; // 'like' or 'dislike'
+  if (!['like', 'dislike'].includes(vote)) return res.status(400).json({ error: 'Invalid vote' });
+
+  const posts = readJson(POSTS_FILE) || {};
+  const post = posts[id];
+  if (!post) return res.status(404).json({ error: 'Post not found' });
+
+  const previousVote = post.userVotes[session.email];
+  if (previousVote) {
+    if (previousVote === 'like') post.likes--;
+    else post.dislikes--;
+  }
+
+  post.userVotes[session.email] = vote;
+  if (vote === 'like') post.likes++;
+  else post.dislikes++;
+
+  writeJson(POSTS_FILE, posts);
+  res.json({ likes: post.likes, dislikes: post.dislikes, userVote: vote });
+});
+
+// Add comment to a post
+app.post('/api/posts/:id/comments', (req, res) => {
+  const session = getSessionFromCookie(req, res);
+  if (!session) return res.status(401).json({ error: 'Unauthorized' });
+  const id = req.params.id;
+  const { content } = req.body || {};
+  if (!content || !content.trim()) return res.status(400).json({ error: 'Comment content required' });
+  if (content.length > 1000) return res.status(400).json({ error: 'Comment too long (max 1000 chars)' });
+
+  const users = readJson(USERS_FILE);
+  const user = users[session.email];
+  const displayName = user ? (user.name || session.email.split('@')[0]) : session.email.split('@')[0];
+  const avatar = user ? (user.icon || 'default') : 'default';
+
+  const posts = readJson(POSTS_FILE) || {};
+  const post = posts[id];
+  if (!post) return res.status(404).json({ error: 'Post not found' });
+
+  const commentId = uuidv4();
+  const comment = {
+    id: commentId,
+    content: sanitizeHtml(content.trim(), { allowedTags: ['p','br','strong','em','u'], allowedAttributes: {} }),
+    author: session.email,
+    authorName: displayName,
+    authorAvatar: avatar,
+    authorEmail: session.email,
+    likes: 0,
+    dislikes: 0,
+    userVotes: {},
+    createdAt: new Date().toISOString()
+  };
+
+  post.comments = post.comments || [];
+  post.comments.push(comment);
+  post.replies = `${post.comments.length} replies`;
+
+  writeJson(POSTS_FILE, posts);
+  res.json({ comment });
+});
+
+// Vote on a comment
+app.post('/api/posts/:postId/comments/:commentId/vote', (req, res) => {
+  const session = getSessionFromCookie(req, res);
+  if (!session) return res.status(401).json({ error: 'Unauthorized' });
+  const postId = req.params.postId;
+  const commentId = req.params.commentId;
+  const { vote } = req.body || {};
+  if (!['like', 'dislike'].includes(vote)) return res.status(400).json({ error: 'Invalid vote' });
+
+  const posts = readJson(POSTS_FILE) || {};
+  const post = posts[postId];
+  if (!post) return res.status(404).json({ error: 'Post not found' });
+
+  const comment = post.comments.find(c => c.id === commentId);
+  if (!comment) return res.status(404).json({ error: 'Comment not found' });
+
+  const previousVote = comment.userVotes[session.email];
+  if (previousVote) {
+    if (previousVote === 'like') comment.likes--;
+    else comment.dislikes--;
+  }
+
+  comment.userVotes[session.email] = vote;
+  if (vote === 'like') comment.likes++;
+  else comment.dislikes++;
+
+  writeJson(POSTS_FILE, posts);
+  res.json({ likes: comment.likes, dislikes: comment.dislikes, userVote: vote });
 });
 
 // Top contributors

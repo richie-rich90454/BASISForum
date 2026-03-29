@@ -177,6 +177,82 @@
             font-size: 14px;
             font-style: italic;
         }
+
+        .comments-section {
+            margin-top: 20px;
+            border-top: 1px solid #e0e0e0;
+            padding-top: 20px;
+        }
+
+        .comments-section h3 {
+            margin-bottom: 16px;
+            color: #333;
+        }
+
+        .comment {
+            margin-bottom: 16px;
+            padding: 12px;
+            background: #f9f9f9;
+            border-radius: 8px;
+        }
+
+        .comment-author {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .comment-content {
+            color: #333;
+            line-height: 1.5;
+        }
+
+        .comment-meta {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-top: 8px;
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .comment-vote-btn {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 8px;
+            border: none;
+            background: none;
+            cursor: pointer;
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .comment-vote-btn:hover {
+            color: #333;
+        }
+
+        .comment-vote-btn.voted {
+            color: #1976d2;
+        }
+
+        .add-comment {
+            margin-top: 16px;
+        }
+
+        .add-comment textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            resize: vertical;
+            box-sizing: border-box;
+        }
+
+        .add-comment button {
+            margin-top: 8px;
+        }
     </style>
 </head>
 <body>
@@ -338,8 +414,16 @@
                     </button>
                     <button class="modal-vote-btn dislike-btn" id="modalDislikeBtn" onclick="modalVote('dislike')">
                         <i class="material-icons-outlined">thumb_down</i>
-                        <span class="modal-vote-count" id="modalDislikeCount">0</span>
                     </button>
+                </div>
+
+                <div class="comments-section">
+                    <h3>Comments</h3>
+                    <div id="commentsList"></div>
+                    <div class="add-comment">
+                        <textarea id="commentInput" placeholder="Add a comment..." rows="3"></textarea>
+                        <button id="submitCommentBtn" class="mdl-button mdl-js-button mdl-button--colored">Comment</button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -451,6 +535,7 @@
 
                 const inner = document.createElement('div');
                 inner.className = 'discussion-content';
+                const avatarClass = p.authorAvatar === 'student' ? 'avatar-student' : (p.authorAvatar === 'scholar' ? 'avatar-scholar' : (p.authorAvatar === 'expert' ? 'avatar-expert' : 'avatar-default'));
                 inner.innerHTML = `
                     <div class="discussion-header">
                         <span class="discussion-badge ${p.badgeClass||'badge-discussion'}">${p.badge||'Discussion'}</span>
@@ -458,10 +543,17 @@
                     </div>
                     <p class="discussion-preview">${sanitizePreview(p.content).slice(0, 240)}${sanitizePreview(p.content).length>240? '...': ''}</p>
                     <div class="discussion-meta">
-                        <span class="meta-item"><i class="material-icons-outlined">person</i> ${p.author}</span>
+                        <div class="author-info">
+                            <div class="author-avatar ${avatarClass}">${p.authorAvatar === 'default' ? 'D' : p.authorAvatar.charAt(0).toUpperCase()}</div>
+                            <div class="author-details">
+                                <span class="author-name">${p.authorName}</span>
+                                <span class="author-email">${p.authorEmail}</span>
+                            </div>
+                        </div>
                         <span class="meta-item"><i class="material-icons-outlined">category</i> ${p.category||''}</span>
                         <span class="meta-item"><i class="material-icons-outlined">schedule</i> ${relativeTime(p.createdAt)}</span>
                         <span class="meta-item"><i class="material-icons-outlined">chat_bubble</i> ${p.replies||'0 replies'}</span>
+                        <span class="meta-item"><i class="material-icons-outlined">thumb_up</i> ${p.likes || 0}</span>
                     </div>`;
 
                 card.appendChild(inner);
@@ -523,10 +615,24 @@
             document.getElementById('modalBadge').textContent = post.badge || 'Discussion';
             document.getElementById('modalBadge').className = `post-detail-badge ${post.badgeClass||'badge-discussion'}`;
             document.getElementById('modalContent').innerHTML = post.content;
-            document.getElementById('modalAuthor').innerHTML = `<i class="material-icons-outlined">person</i> ${post.author}`;
+            document.getElementById('modalAuthor').innerHTML = `
+                <div class="author-info">
+                    <div class="author-avatar ${post.authorAvatar === 'student' ? 'avatar-student' : (post.authorAvatar === 'scholar' ? 'avatar-scholar' : (post.authorAvatar === 'expert' ? 'avatar-expert' : 'avatar-default'))}">${post.authorAvatar === 'default' ? 'D' : post.authorAvatar.charAt(0).toUpperCase()}</div>
+                    <div class="author-details">
+                        <span class="author-name">${post.authorName}</span>
+                        <span class="author-email">${post.authorEmail}</span>
+                    </div>
+                </div>`;
             document.getElementById('modalCategory').innerHTML = `<i class="material-icons-outlined">category</i> ${post.category||''}`;
             document.getElementById('modalDate').innerHTML = `<i class="material-icons-outlined">schedule</i> ${relativeTime(post.createdAt)}`;
             document.getElementById('modalReplies').innerHTML = `<i class="material-icons-outlined">chat_bubble</i> ${post.replies||'0 replies'}`;
+
+            // Update vote buttons
+            document.getElementById('modalLikeCount').textContent = post.likes || 0;
+            document.getElementById('modalDislikeCount').textContent = post.dislikes || 0;
+            const userVote = post.userVotes && post.userVotes[currentSessionEmail];
+            document.getElementById('modalLikeBtn').classList.toggle('voted', userVote === 'like');
+            document.getElementById('modalDislikeBtn').classList.toggle('voted', userVote === 'dislike');
 
             // show edit/delete if current user is author
             const existingAction = document.getElementById('modalActions');
@@ -549,16 +655,76 @@
             }
             document.querySelector('.modal-body').appendChild(actions);
 
+            // Render comments
+            renderComments(post.comments || []);
+
             document.getElementById('postModal').classList.add('active');
             document.body.style.overflow = 'hidden';
         }
 
-        function closeModal() {
-            document.getElementById('postModal').classList.remove('active');
-            document.body.style.overflow = 'auto';
-            currentPostId = null;
-            // remove any modalActions if present
-            const a = document.getElementById('modalActions'); if (a) a.remove();
+        function modalVote(voteType) {
+            if (!currentSessionEmail) {
+                alert('Please log in to vote');
+                return;
+            }
+            apiPostAuth(`/api/posts/${currentPostId}/vote`, { vote: voteType }).then(res => {
+                if (!res.ok) return alert(res.data.error || 'Failed to vote');
+                const post = postsById[currentPostId];
+                post.likes = res.data.likes;
+                post.dislikes = res.data.dislikes;
+                post.userVotes[currentSessionEmail] = res.data.userVote;
+                document.getElementById('modalLikeCount').textContent = post.likes;
+                document.getElementById('modalDislikeCount').textContent = post.dislikes;
+                document.getElementById('modalLikeBtn').classList.toggle('voted', res.data.userVote === 'like');
+                document.getElementById('modalDislikeBtn').classList.toggle('voted', res.data.userVote === 'dislike');
+            });
+        }
+
+        function renderComments(comments) {
+            const container = document.getElementById('commentsList');
+            container.innerHTML = '';
+            comments.forEach(c => {
+                const commentEl = document.createElement('div');
+                commentEl.className = 'comment';
+                const avatarClass = c.authorAvatar === 'student' ? 'avatar-student' : (c.authorAvatar === 'scholar' ? 'avatar-scholar' : (c.authorAvatar === 'expert' ? 'avatar-expert' : 'avatar-default'));
+                commentEl.innerHTML = `
+                    <div class="comment-author">
+                        <div class="author-avatar ${avatarClass}">${c.authorAvatar === 'default' ? 'D' : c.authorAvatar.charAt(0).toUpperCase()}</div>
+                        <div class="author-details">
+                            <span class="author-name">${c.authorName}</span>
+                            <span class="author-email">${c.authorEmail}</span>
+                        </div>
+                    </div>
+                    <div class="comment-content">${c.content}</div>
+                    <div class="comment-meta">
+                        <span>${relativeTime(c.createdAt)}</span>
+                        <button class="comment-vote-btn like-btn ${c.userVotes && c.userVotes[currentSessionEmail] === 'like' ? 'voted' : ''}" onclick="commentVote('${c.id}', 'like')">
+                            <i class="material-icons-outlined">thumb_up</i> ${c.likes || 0}
+                        </button>
+                        <button class="comment-vote-btn dislike-btn ${c.userVotes && c.userVotes[currentSessionEmail] === 'dislike' ? 'voted' : ''}" onclick="commentVote('${c.id}', 'dislike')">
+                            <i class="material-icons-outlined">thumb_down</i>
+                        </button>
+                    </div>`;
+                container.appendChild(commentEl);
+            });
+        }
+
+        function commentVote(commentId, voteType) {
+            if (!currentSessionEmail) {
+                alert('Please log in to vote');
+                return;
+            }
+            apiPostAuth(`/api/posts/${currentPostId}/comments/${commentId}/vote`, { vote: voteType }).then(res => {
+                if (!res.ok) return alert(res.data.error || 'Failed to vote');
+                const post = postsById[currentPostId];
+                const comment = post.comments.find(c => c.id === commentId);
+                if (comment) {
+                    comment.likes = res.data.likes;
+                    comment.dislikes = res.data.dislikes;
+                    comment.userVotes[currentSessionEmail] = res.data.userVote;
+                    renderComments(post.comments);
+                }
+            });
         }
 
         // edit flow: replace modal content with editable fields
@@ -649,6 +815,24 @@
             });
 
             document.getElementById('submitPostBtn').addEventListener('click', submitNewPost);
+
+            // Comment submit
+            document.getElementById('submitCommentBtn').addEventListener('click', async () => {
+                if (!currentSessionEmail) {
+                    alert('Please log in to comment');
+                    return;
+                }
+                const content = document.getElementById('commentInput').value.trim();
+                if (!content) return;
+                const res = await apiPostAuth(`/api/posts/${currentPostId}/comments`, { content });
+                if (!res.ok) return alert(res.data.error || 'Failed to add comment');
+                const post = postsById[currentPostId];
+                post.comments.push(res.data.comment);
+                post.replies = `${post.comments.length} replies`;
+                document.getElementById('commentInput').value = '';
+                renderComments(post.comments);
+                document.getElementById('modalReplies').innerHTML = `<i class="material-icons-outlined">chat_bubble</i> ${post.replies}`;
+            });
 
             // search
             document.getElementById('search-expandable').addEventListener('input', () => filterAndRender(window.__allPosts||[], document.getElementById('search-expandable').value.trim(), window.__currentCategoryFilter || ''));

@@ -35,7 +35,7 @@
                         </div>
                         <div id="accountLogged" style="display:none;">
                             <a href="account-settings.html" class="account-option"><i class="material-icons-outlined">settings</i> Account Settings</a>
-                            <div class="account-option"><i class="material-icons-outlined">person</i> <span id="accountEmail">User</span></div>
+                            <div class="account-option"><span id="accountEmail">User</span></div>
                             <div class="account-option" id="accountLogout"><i class="material-icons-outlined">logout</i> Logout</div>
                         </div>
                     </div>
@@ -44,9 +44,14 @@
         </header>
 
         <main class="mdl-layout__content">
+            <div class="page-content">
+                <div class="hero-section">
+                    <h1>Account Settings</h1>
+                    <p class="subtitle">Manage your account information and preferences</p>
+                </div>
+            </div>
     <div class="settings-container">
-        <h1>Account Settings</h1>
-        <p>Update your display name, icon, email and password.</p>
+        <p>Update your display name, avatar, email and password.</p>
 
         <div class="form-group">
             <label for="nameInput">Display Name</label>
@@ -54,8 +59,13 @@
         </div>
 
         <div class="form-group">
-            <label for="iconInput">User Icon (emoji or initials)</label>
-            <input id="iconInput" type="text" placeholder="e.g. JD or 😄" />
+            <label for="avatarSelect">User Avatar</label>
+            <select id="avatarSelect">
+                <option value="default">Default</option>
+                <option value="student">Student</option>
+                <option value="scholar">Scholar</option>
+                <option value="expert">Expert</option>
+            </select>
         </div>
 
         <div class="form-group">
@@ -114,18 +124,33 @@
                 if (s && s.loggedIn) {
                     notLogged.style.display = 'none'; logged.style.display = 'block'; emailEl.textContent = s.email;
                 } else { notLogged.style.display = 'block'; logged.style.display = 'none'; }
+
+                // Toggle account dropdown on click
+                const accountButton = document.getElementById('accountButton');
+                const accountDropdown = document.getElementById('accountDropdown');
+                accountButton.addEventListener('click', () => {
+                    accountDropdown.style.display = accountDropdown.style.display === 'block' ? 'none' : 'block';
+                });
+
+                // Close dropdown when clicking outside
+                document.addEventListener('click', (e) => {
+                    if (!accountButton.contains(e.target) && !accountDropdown.contains(e.target)) {
+                        accountDropdown.style.display = 'none';
+                    }
+                });
+
                 document.getElementById('accountLogout').addEventListener('click', async () => { await fetch('/api/logout', { method: 'POST', credentials: 'include' }); window.location.reload(); });
             } catch (e) { }
 
             const info = await getAccount();
             if (!info) return;
             document.getElementById('nameInput').value = info.name || '';
-            document.getElementById('iconInput').value = info.icon || '';
+            document.getElementById('avatarSelect').value = info.icon || 'default';
             document.getElementById('emailInput').value = info.email || '';
 
             document.getElementById('saveSettingsBtn').addEventListener('click', async () => {
                 const name = document.getElementById('nameInput').value.trim();
-                const icon = document.getElementById('iconInput').value.trim();
+                const icon = document.getElementById('avatarSelect').value;
                 const email = document.getElementById('emailInput').value.trim();
                 const currentPassword = document.getElementById('currentPassword').value;
                 const newPassword = document.getElementById('newPassword').value;

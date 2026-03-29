@@ -55,6 +55,7 @@ document.addEventListener('DOMContentLoaded', function () {
       const confirm = document.getElementById('signup-confirm').value;
       const errorEl = document.getElementById('signup-error');
       errorEl.textContent = '';
+      if (email.substring(email.length-8,email.length)!="@basischina.com") return (errorEl.textContent = 'invalid email');
       if (password !== confirm) return (errorEl.textContent = 'Passwords do not match.');
       if (password.length < 6) return (errorEl.textContent = 'Password must be at least 6 characters.');
 
