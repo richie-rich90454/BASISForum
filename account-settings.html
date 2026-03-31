@@ -6,6 +6,9 @@
     <title>Account Settings</title>
     <link href="https://fonts.googleapis.com/css2?family=Aptos:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined">
+    <link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.indigo-blue.min.css">
+    <script defer src="https://code.getmdl.io/1.3.0/material.min.js"></script>
     <link rel="stylesheet" href="styles.css">
     <style>
         .settings-container { max-width:640px; margin:40px auto; padding:20px; }
@@ -23,7 +26,7 @@
                     <a class="mdl-navigation__link" href="index.html">Home</a>
                     <a class="mdl-navigation__link" href="study-guide.html">Study Guide</a>
                     <a class="mdl-navigation__link" href="forum.html">Forum</a>
-                    <a class="mdl-navigation__link" href="account-settings.html">Account</a>
+                    <a class="mdl-navigation__link is-active" href="account.html">Account</a>
                 </nav>
                 <div class="account-menu">
                     <button id="accountButton" class="account-button" title="Account">
@@ -91,6 +94,19 @@
         <div class="form-actions">
             <button id="saveSettingsBtn" class="mdl-button mdl-js-button mdl-button--colored">Save Changes</button>
         </div>
+    </div>
+        </main>
+
+        <footer class="mdl-mini-footer">
+            <div class="mdl-mini-footer__left-section">
+                <div class="mdl-logo">AP World History Hub</div>
+                <ul class="mdl-mini-footer__link-list">
+                    <li><a href="#">About Us</a></li>
+                    <li><a href="#">Privacy Policy</a></li>
+                    <li><a href="#">Terms of Service</a></li>
+                </ul>
+            </div>
+        </footer>
     </div>
 
     <script>
@@ -170,18 +186,5 @@
             });
         });
     </script>
-
-    <footer class="mdl-mini-footer">
-        <div class="mdl-mini-footer__left-section">
-            <div class="mdl-logo">AP World History Hub</div>
-            <ul class="mdl-mini-footer__link-list">
-                <li><a href="#">About Us</a></li>
-                <li><a href="#">Privacy Policy</a></li>
-                <li><a href="#">Terms of Service</a></li>
-            </ul>
-        </div>
-    </footer>
-    </main>
-    </div>
 </body>
 </html>
