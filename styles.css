@@ -31,7 +31,7 @@ body {
 /* Account Menu Styling */
 .account-menu {
     position: relative;
-    margin-left: 16px;
+    margin-left: auto; /* push account menu to far right */
 }
 
 .account-button {

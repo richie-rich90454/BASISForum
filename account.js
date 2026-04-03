@@ -1,6 +1,23 @@
 // Account page JS: toggles forms and talks to local backend API via secure cookies
 // Session token is now stored in HttpOnly cookie (not localStorage)
 
+function initAccountDropdown() {
+  const accountButton = document.getElementById('accountButton');
+  const accountDropdown = document.getElementById('accountDropdown');
+  if (!accountButton || !accountDropdown) return;
+
+  accountButton.addEventListener('click', (event) => {
+    event.stopPropagation();
+    accountDropdown.style.display = accountDropdown.style.display === 'block' ? 'none' : 'block';
+  });
+
+  document.addEventListener('click', (event) => {
+    if (!accountButton.contains(event.target) && !accountDropdown.contains(event.target)) {
+      accountDropdown.style.display = 'none';
+    }
+  });
+}
+
 function showLogin() {
   document.getElementById('login-box').style.display = 'block';
   document.getElementById('signup-box').style.display = 'none';
@@ -22,6 +39,7 @@ async function apiPost(path, body) {
 }
 
 document.addEventListener('DOMContentLoaded', function () {
+  initAccountDropdown();
   const toSignup = document.getElementById('to-signup');
   const toLogin = document.getElementById('to-login');
   if (toSignup) toSignup.addEventListener('click', showSignup);

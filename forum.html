@@ -46,9 +46,9 @@
 
         .modal-content {
             background: white;
-            width: 90%;
+            width: 50vw;
             max-width: 800px;
-            max-height: 90vh;
+            max-height: 80vh;
             overflow-y: auto;
             border-radius: 8px;
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
@@ -414,6 +414,7 @@
                     </button>
                     <button class="modal-vote-btn dislike-btn" id="modalDislikeBtn" onclick="modalVote('dislike')">
                         <i class="material-icons-outlined">thumb_down</i>
+                        <span class="modal-vote-count" id="modalDislikeCount">0</span>
                     </button>
                 </div>
 
@@ -554,6 +555,11 @@
                         <span class="meta-item"><i class="material-icons-outlined">schedule</i> ${relativeTime(p.createdAt)}</span>
                         <span class="meta-item"><i class="material-icons-outlined">chat_bubble</i> ${p.replies||'0 replies'}</span>
                         <span class="meta-item"><i class="material-icons-outlined">thumb_up</i> ${p.likes || 0}</span>
+                    </div>
+                    <div class="discussion-actions" style="margin-top: 12px; display:flex; align-items:center; gap:10px;">
+                        <button class="modal-vote-btn like-btn card-like-btn" data-post-id="${p.id}" data-vote="like" style="font-size:12px; padding:8px 12px;"> <i class="material-icons-outlined">thumb_up</i> ${p.likes || 0}</button>
+                        <button class="modal-vote-btn dislike-btn card-dislike-btn" data-post-id="${p.id}" data-vote="dislike" style="font-size:12px; padding:8px 12px;"> <i class="material-icons-outlined">thumb_down</i> ${p.dislikes || 0}</button>
+                        <button class="mdl-button mdl-js-button mdl-button--colored card-comment-btn" data-post-id="${p.id}" style="font-size:12px; padding:6px 10px;">Comment</button>
                     </div>`;
 
                 card.appendChild(inner);
@@ -562,7 +568,51 @@
 
             // attach click handlers
             const cards = container.querySelectorAll('.discussion-card');
-            cards.forEach(card => card.addEventListener('click', function(){ openPostDetail(this.getAttribute('data-post-id')); }));
+            cards.forEach(card => {
+                const postId = card.getAttribute('data-post-id');
+
+                // single click opens detail as fallback
+                card.addEventListener('click', (e) => {
+                    if (e.target.closest('.card-like-btn') || e.target.closest('.card-dislike-btn') || e.target.closest('.card-comment-btn')) {
+                        return;
+                    }
+                    openPostDetail(postId);
+                });
+
+                // double-click opens detail with modal view
+                card.addEventListener('dblclick', (e) => {
+                    e.preventDefault();
+                    openPostDetail(postId);
+                });
+
+                // like/dislike directly from list
+                const likeBtn = card.querySelector('.card-like-btn');
+                const dislikeBtn = card.querySelector('.card-dislike-btn');
+                const commentBtn = card.querySelector('.card-comment-btn');
+
+                if (likeBtn) {
+                    likeBtn.addEventListener('click', async (e) => {
+                        e.stopPropagation();
+                        await cardVote(postId, 'like');
+                    });
+                }
+                if (dislikeBtn) {
+                    dislikeBtn.addEventListener('click', async (e) => {
+                        e.stopPropagation();
+                        await cardVote(postId, 'dislike');
+                    });
+                }
+                if (commentBtn) {
+                    commentBtn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        openPostDetail(postId);
+                        setTimeout(() => {
+                            const commentInput = document.getElementById('commentInput');
+                            if (commentInput) commentInput.focus();
+                        }, 250);
+                    });
+                }
+            });
         }
 
         // filtering/search
@@ -680,6 +730,39 @@
             });
         }
 
+        async function cardVote(postId, voteType) {
+            if (!currentSessionEmail) {
+                alert('Please log in to vote');
+                return;
+            }
+            const res = await apiPostAuth(`/api/posts/${postId}/vote`, { vote: voteType });
+            if (!res.ok) return alert(res.data.error || 'Failed to vote');
+
+            const post = postsById[postId];
+            if (!post) return;
+
+            post.likes = res.data.likes;
+            post.dislikes = res.data.dislikes;
+            post.userVotes[currentSessionEmail] = res.data.userVote;
+
+            // update card displays
+            const card = document.querySelector(`.discussion-card[data-post-id="${postId}"]`);
+            if (card) {
+                const likeBtn = card.querySelector('.card-like-btn');
+                const dislikeBtn = card.querySelector('.card-dislike-btn');
+                if (likeBtn) likeBtn.innerHTML = `<i class="material-icons-outlined">thumb_up</i> ${post.likes}`;
+                if (dislikeBtn) dislikeBtn.innerHTML = `<i class="material-icons-outlined">thumb_down</i> ${post.dislikes}`;
+                if (likeBtn) likeBtn.classList.toggle('voted', res.data.userVote === 'like');
+                if (dislikeBtn) dislikeBtn.classList.toggle('voted', res.data.userVote === 'dislike');
+            }
+            if (currentPostId === postId) {
+                document.getElementById('modalLikeCount').textContent = post.likes;
+                document.getElementById('modalDislikeCount').textContent = post.dislikes;
+                document.getElementById('modalLikeBtn').classList.toggle('voted', res.data.userVote === 'like');
+                document.getElementById('modalDislikeBtn').classList.toggle('voted', res.data.userVote === 'dislike');
+            }
+        }
+
         function renderComments(comments) {
             const container = document.getElementById('commentsList');
             container.innerHTML = '';
@@ -762,6 +845,12 @@
         // New post modal
         function openNewPost() { document.getElementById('newPostModal').classList.add('active'); document.body.style.overflow='hidden'; }
         function closeNewPost(){ document.getElementById('newPostModal').classList.remove('active'); document.body.style.overflow='auto'; document.getElementById('newPostError').textContent=''; }
+        function closeModal(){
+            document.getElementById('postModal').classList.remove('active');
+            document.body.style.overflow = 'auto';
+            currentPostId = null;
+            document.getElementById('commentInput').value = '';
+        }
 
         async function submitNewPost() {
             const title = document.getElementById('newTitle').value.trim();
