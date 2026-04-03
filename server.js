@@ -23,7 +23,7 @@ const SESSIONS_FILE = path.join(DATA_DIR, 'sessions.json');
 const POSTS_FILE = path.join(DATA_DIR, 'posts.json');
 
 function validateEmail(email) {
-  const regex = /^[a-zA-Z]+\.[a-zA-Z]+\d+-[a-zA-Z]+@basischina\.com$/;
+  const regex = /^[a-zA-Z]+\.[a-zA-Z]+\d+-[a-zA-Z]+@basischina\.com$/;  
   return regex.test(email);
 }
 
