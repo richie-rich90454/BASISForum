@@ -6,6 +6,9 @@
     <title>Account Settings</title>
     <link href="https://fonts.googleapis.com/css2?family=Aptos:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons+Outlined">
+    <link rel="stylesheet" href="https://code.getmdl.io/1.3.0/material.indigo-blue.min.css">
+    <script defer src="https://code.getmdl.io/1.3.0/material.min.js"></script>
     <link rel="stylesheet" href="styles.css">
     <style>
         .settings-container { max-width:640px; margin:40px auto; padding:20px; }
@@ -23,7 +26,7 @@
                     <a class="mdl-navigation__link" href="index.html">Home</a>
                     <a class="mdl-navigation__link" href="study-guide.html">Study Guide</a>
                     <a class="mdl-navigation__link" href="forum.html">Forum</a>
-                    <a class="mdl-navigation__link" href="account-settings.html">Account</a>
+                    <a class="mdl-navigation__link is-active" href="account.html">Account</a>
                 </nav>
                 <div class="account-menu">
                     <button id="accountButton" class="account-button" title="Account">
@@ -35,7 +38,7 @@
                         </div>
                         <div id="accountLogged" style="display:none;">
                             <a href="account-settings.html" class="account-option"><i class="material-icons-outlined">settings</i> Account Settings</a>
-                            <div class="account-option"><i class="material-icons-outlined">person</i> <span id="accountEmail">User</span></div>
+                            <div class="account-option"><span id="accountEmail">User</span></div>
                             <div class="account-option" id="accountLogout"><i class="material-icons-outlined">logout</i> Logout</div>
                         </div>
                     </div>
@@ -44,9 +47,14 @@
         </header>
 
         <main class="mdl-layout__content">
+            <div class="page-content">
+                <div class="hero-section">
+                    <h1>Account Settings</h1>
+                    <p class="subtitle">Manage your account information and preferences</p>
+                </div>
+            </div>
     <div class="settings-container">
-        <h1>Account Settings</h1>
-        <p>Update your display name, icon, email and password.</p>
+        <p>Update your display name, avatar, email and password.</p>
 
         <div class="form-group">
             <label for="nameInput">Display Name</label>
@@ -54,8 +62,13 @@
         </div>
 
         <div class="form-group">
-            <label for="iconInput">User Icon (emoji or initials)</label>
-            <input id="iconInput" type="text" placeholder="e.g. JD or 😄" />
+            <label for="avatarSelect">User Avatar</label>
+            <select id="avatarSelect">
+                <option value="default">Default</option>
+                <option value="student">Student</option>
+                <option value="scholar">Scholar</option>
+                <option value="expert">Expert</option>
+            </select>
         </div>
 
         <div class="form-group">
@@ -81,6 +94,19 @@
         <div class="form-actions">
             <button id="saveSettingsBtn" class="mdl-button mdl-js-button mdl-button--colored">Save Changes</button>
         </div>
+    </div>
+        </main>
+
+        <footer class="mdl-mini-footer">
+            <div class="mdl-mini-footer__left-section">
+                <div class="mdl-logo">AP World History Hub</div>
+                <ul class="mdl-mini-footer__link-list">
+                    <li><a href="#">About Us</a></li>
+                    <li><a href="#">Privacy Policy</a></li>
+                    <li><a href="#">Terms of Service</a></li>
+                </ul>
+            </div>
+        </footer>
     </div>
 
     <script>
@@ -114,18 +140,33 @@
                 if (s && s.loggedIn) {
                     notLogged.style.display = 'none'; logged.style.display = 'block'; emailEl.textContent = s.email;
                 } else { notLogged.style.display = 'block'; logged.style.display = 'none'; }
+
+                // Toggle account dropdown on click
+                const accountButton = document.getElementById('accountButton');
+                const accountDropdown = document.getElementById('accountDropdown');
+                accountButton.addEventListener('click', () => {
+                    accountDropdown.style.display = accountDropdown.style.display === 'block' ? 'none' : 'block';
+                });
+
+                // Close dropdown when clicking outside
+                document.addEventListener('click', (e) => {
+                    if (!accountButton.contains(e.target) && !accountDropdown.contains(e.target)) {
+                        accountDropdown.style.display = 'none';
+                    }
+                });
+
                 document.getElementById('accountLogout').addEventListener('click', async () => { await fetch('/api/logout', { method: 'POST', credentials: 'include' }); window.location.reload(); });
             } catch (e) { }
 
             const info = await getAccount();
             if (!info) return;
             document.getElementById('nameInput').value = info.name || '';
-            document.getElementById('iconInput').value = info.icon || '';
+            document.getElementById('avatarSelect').value = info.icon || 'default';
             document.getElementById('emailInput').value = info.email || '';
 
             document.getElementById('saveSettingsBtn').addEventListener('click', async () => {
                 const name = document.getElementById('nameInput').value.trim();
-                const icon = document.getElementById('iconInput').value.trim();
+                const icon = document.getElementById('avatarSelect').value;
                 const email = document.getElementById('emailInput').value.trim();
                 const currentPassword = document.getElementById('currentPassword').value;
                 const newPassword = document.getElementById('newPassword').value;
@@ -145,18 +186,5 @@
             });
         });
     </script>
-
-    <footer class="mdl-mini-footer">
-        <div class="mdl-mini-footer__left-section">
-            <div class="mdl-logo">AP World History Hub</div>
-            <ul class="mdl-mini-footer__link-list">
-                <li><a href="#">About Us</a></li>
-                <li><a href="#">Privacy Policy</a></li>
-                <li><a href="#">Terms of Service</a></li>
-            </ul>
-        </div>
-    </footer>
-    </main>
-    </div>
 </body>
 </html>

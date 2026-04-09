@@ -69,10 +69,6 @@ body {
     overflow: hidden;
 }
 
-.account-menu:hover .account-dropdown {
-    display: block;
-}
-
 .account-option {
     display: flex;
     align-items: center;
@@ -240,6 +236,15 @@ body {
     box-sizing: border-box;
 }
 
+.form-group select {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 1rem;
+    box-sizing: border-box;
+}
+
 .form-actions {
     text-align: center;
     margin-top: 12px;
@@ -272,6 +277,95 @@ body {
     font-size: 0.9rem;
     margin-top: -8px;
     margin-bottom: 8px;
+}
+
+/* Discussion styles */
+.discussion-card {
+    margin-bottom: 16px;
+}
+
+.discussion-content {
+    padding: 16px;
+}
+
+.discussion-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+}
+
+.discussion-badge {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.badge-discussion { background: #e3f2fd; color: #1976d2; }
+.badge-question { background: #e3f2fd; color: #1976d2; }
+.badge-tips { background: #fff3e0; color: #f57c00; }
+.badge-resource { background: #f3e5f5; color: #7b1fa2; }
+
+.discussion-preview {
+    color: #666;
+    margin-bottom: 12px;
+    line-height: 1.5;
+}
+
+.discussion-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 16px;
+    font-size: 0.9rem;
+    color: #666;
+}
+
+.author-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.author-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 14px;
+    color: white;
+}
+
+.avatar-default { background: #3454A5; }
+.avatar-student { background: #2196f3; }
+.avatar-scholar { background: #ff9800; }
+.avatar-expert { background: #4caf50; }
+
+.author-details {
+    display: flex;
+    flex-direction: column;
+}
+
+.author-name {
+    font-weight: 600;
+    color: #333;
+}
+
+.author-email {
+    font-size: 0.8rem;
+    color: #666;
+    opacity: 0.7;
+}
+
+.meta-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
 }
 
 .subject-card .mdl-card__title {
